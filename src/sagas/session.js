@@ -62,6 +62,21 @@ export function* listBuckets(getState, action) {
     const client = getClient();
     // Fetch server information
     const serverInfo = yield call([client, client.fetchServerInfo]);
+
+    const {user={}} = serverInfo;
+    const {session: {auth: {authType, credentials: {username}}}} = getState();
+    if (authType != "anonymous") {
+      if (user) {
+        const [policy, userId] = user.id.split(":", 1);
+        if (policy !≃ authType) {
+          throw "Could not authenticate ${username} with ${authType}"
+        }
+      }
+      else {
+          throw "Could not authenticate ${username} with ${authType}"
+      }
+    }
+
     // We got a valid response; officially declare current user authenticated
     // XXX: authenticated here means that we have setup the client, not
     // that the credentials are valid :/
