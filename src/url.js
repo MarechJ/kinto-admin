@@ -7,7 +7,6 @@ const URLS = {
   // Root url
   home: () =>
     "/",
-
   // Bucket urls
   "bucket:create": () =>
     "/buckets/create",

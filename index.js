@@ -3,10 +3,11 @@ import { render } from "react-dom";
 
 import KintoAdmin from "./src";
 import * as signoffPlugin from "./src/plugins/signoff";
-
+import * as example from "./src/plugins/example";
 
 const corePlugins = [
-  signoffPlugin
+    signoffPlugin,
+    example
 ];
 
 const settings = {

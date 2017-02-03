@@ -1,9 +1,12 @@
 var path = require("path");
 var webpack = require("webpack");
 var version = require("./package.json").version;
+var password_api = require("./plugin_config.json").password_api
+
+console.log(password_api)
 
 module.exports = {
-  devtool: "#inline-source-map",
+    devtool: "#inline-source-map",
   entry: [
     "webpack-hot-middleware/client",
     "./index"
@@ -20,7 +23,8 @@ module.exports = {
     new webpack.DefinePlugin({
       "process.env": {
         NODE_ENV: JSON.stringify("development"),
-        KINTO_ADMIN_VERSION: JSON.stringify(version),
+          KINTO_ADMIN_VERSION: JSON.stringify(version),
+          PASSWORD_API: JSON.stringify(password_api)
       }
     }),
   ],

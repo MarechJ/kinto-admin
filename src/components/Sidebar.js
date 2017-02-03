@@ -132,7 +132,15 @@ export default class Sidebar extends Component {
           <div className="list-group">
             <SideBarLink name="home" currentPath={currentPath}>Home</SideBarLink>
           </div>
-        </div>
+            </div>
+
+        <div className="panel panel-default">
+            <div className="list-group">
+
+            <a className="list-group-item " href="#/plugin/passgen"><i className="glyphicon glyphicon-lock"></i>Password generator</a>
+
+            </div>
+         </div>
         {session.authenticated ?
           <BucketsMenu
             buckets={buckets}
