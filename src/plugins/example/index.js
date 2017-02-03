@@ -4,8 +4,9 @@ import { put } from "redux-saga/effects";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import "whatwg-fetch";
+import { generate } from "generate-password";
 
-
+/* Clean up remains of test plugin */
 const PLUGIN_ACTION_REQUEST = "PLUGIN_ACTION_REQUEST";
 const PLUGIN_ACTION_SUCCESS = "PLUGIN_ACTION_SUCCESS";
 //const PASSWORD_API_URL = process.env.PASSWORD_API ? process.env.ENV : ''
@@ -32,6 +33,7 @@ function mapDispatchToProps(dispatch) {
 
 // Plugin view root container component
 class TestPlugin extends React.Component {
+    /* This thing should probably be split in several component. */
     constructor(props) {
         super(props);
         this.state = {
@@ -45,33 +47,20 @@ class TestPlugin extends React.Component {
     }
 
     passwordGenerator() {
-        const len = 32;
-        let length = (len)?(len):(10);
-        let string = "abcdefghijklmnopqrstuvwxyz"; //to upper
-        let numeric = '0123456789';
-        let punctuation = "$-_.+!*'(),";
-        let password = "";
-        let character = "";
-        let crunch = true;
-        while( password.length<length ) {
-            let entity1 = Math.ceil(string.length * Math.random()*Math.random());
-            let entity2 = Math.ceil(numeric.length * Math.random()*Math.random());
-            let entity3 = Math.ceil(punctuation.length * Math.random()*Math.random());
-            let hold = string.charAt( entity1 );
-            hold = (entity1%2==0)?(hold.toUpperCase()):(hold);
-            character += hold;
-            character += numeric.charAt( entity2 );
-            character += punctuation.charAt( entity3 );
-            password = character;
-        }
-        const pass = password;
+
+        const pass = generate({
+            length: 32,
+            numbers: true,
+            symbols: true,
+            exclude: ' "<>#%{}|\^~[]`;/?:@=&'
+        });
         this.setState({password: pass, principal: "", password_error: false});
         return false;
     }
 
     handleChange(event) {
         this.setState({password: event.target.value, password_error: false});
-        return fals;
+        return false;
     }
 
     handleFocus(event) {
@@ -124,7 +113,7 @@ class TestPlugin extends React.Component {
                     <span className="input-group-btn">
                       <button className="btn btn-default" onClick={() => this.passwordGenerator()}>Gen password</button>
                     </span>
-                    <input placeholder="password" type="text" className="form-control" value={this.state.password} onChange={this.handleChange}/>
+                    <input placeholder="password" type="text" className="form-control" onFocus={this.handleFocus}  value={this.state.password} onChange={this.handleChange}/>
                     <span className={"glyphicon glyphicon-remove form-control-feedback " + (this.state.password_error ? '' : 'hidden')}></span>
 
                   </div>
@@ -147,6 +136,10 @@ class TestPlugin extends React.Component {
     );
   }
 }
+/*
+The plugin API is/was undocumented at the time of coding so I did not touch the unlcear part.
+If you know what you are doing please fix/remove the test plugin remains
+ */
 
 const TestPluginContainer = connect(mapStateToProps, mapDispatchToProps)(TestPlugin);
 
@@ -157,6 +150,7 @@ function* testSaga(getState, action) {
 }
 
 // Plugin exports
+// If you change the path change it in the SideBar as well it's hardcoded there.
 const routes = [
     {path: "/plugin/passgen", name: "generator", components: {content: TestPluginContainer}}
 ];

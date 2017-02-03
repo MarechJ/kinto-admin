@@ -16,14 +16,14 @@ module.exports = {
   output: {
     path: path.join(__dirname, "build"),
     filename: "bundle.js",
-    publicPath: "/kinto-admin/",
+    publicPath: "/",
   },
   plugins: [
     new webpack.IgnorePlugin(/^(buffertools)$/), // unwanted "deeper" dependency
     new ExtractTextPlugin("styles.css", {allChunks: true}),
     new webpack.DefinePlugin({
       "process.env": {
-          NODE_ENV: JSON.stringify("production"),
+        NODE_ENV: JSON.stringify("production"),
           KINTO_ADMIN_VERSION: JSON.stringify(version),
           PASSWORD_API: JSON.stringify(password_api)
       }
