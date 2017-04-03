@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import "whatwg-fetch";
 import { generate } from "generate-password";
 
+
 /* Clean up remains of test plugin */
 const PLUGIN_ACTION_REQUEST = "PLUGIN_ACTION_REQUEST";
 const PLUGIN_ACTION_SUCCESS = "PLUGIN_ACTION_SUCCESS";
@@ -15,20 +16,20 @@ const PASSWORD_API = process.env.PASSWORD_API;
 
 // Test actions
 function testActionRequest() {
-  return {type: PLUGIN_ACTION_REQUEST};
+  return { type: PLUGIN_ACTION_REQUEST };
 }
 
 function testActionSuccess() {
-  return {type: PLUGIN_ACTION_SUCCESS, answer: 42};
+  return { type: PLUGIN_ACTION_SUCCESS, answer: 42 };
 }
 
 // Container setup
 function mapStateToProps(state) {
-  return {plugin: state.plugin};
+  return { plugin: state.plugin };
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({testActionRequest}, dispatch);
+  return bindActionCreators({ testActionRequest }, dispatch);
 }
 
 // Plugin view root container component
@@ -141,7 +142,9 @@ The plugin API is/was undocumented at the time of coding so I did not touch the 
 If you know what you are doing please fix/remove the test plugin remains
  */
 
-const TestPluginContainer = connect(mapStateToProps, mapDispatchToProps)(TestPlugin);
+const TestPluginContainer = connect(mapStateToProps, mapDispatchToProps)(
+  TestPlugin
+);
 
 // Test saga
 function* testSaga(getState, action) {
@@ -155,25 +158,23 @@ const routes = [
     {path: "/plugin/passgen", name: "generator", components: {content: TestPluginContainer}}
 ];
 
-export const sagas = [
-  [takeEvery, PLUGIN_ACTION_REQUEST, testSaga]
-];
+export const sagas = [[takeEvery, PLUGIN_ACTION_REQUEST, testSaga]];
 
 export const reducers = {
-  plugin(state = {answer: 0}, action) {
-    switch(action.type) {
+  plugin(state = { answer: 0 }, action) {
+    switch (action.type) {
       case PLUGIN_ACTION_SUCCESS: {
-        return {...state, answer: action.answer};
+        return { ...state, answer: action.answer };
       }
       default: {
         return state;
       }
     }
-  }
+  },
 };
 
 export function register(store) {
   return {
-    routes
+    routes,
   };
 }

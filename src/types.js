@@ -1,7 +1,6 @@
 /* @flow */
 import type { Reducer, Store } from "redux";
 
-
 type _$ReturnType<B, F: (...args: any[]) => B> = B; // eslint-disable-line
 export type $ReturnType<F> = _$ReturnType<*, F>;
 
@@ -71,10 +70,10 @@ export type ClientError = {
     message: string,
     details: {
       existing: {
-        id: string
-      }
-    }
-  }
+        id: string,
+      },
+    },
+  },
 };
 
 export type HistoryFilters = {
@@ -104,7 +103,7 @@ export type CollectionData = {
     required: boolean,
     gzipped: boolean,
   },
-  displayFields?: ?string[],
+  displayFields?: ?(string[]),
   sort?: string,
   cache_expires?: number,
   status?: string,
@@ -163,7 +162,7 @@ export type Paginator<T> = {
 };
 
 export type Permissions =
-  BucketPermissions
+  | BucketPermissions
   | GroupPermissions
   | CollectionPermissions
   | RecordPermissions;
@@ -171,7 +170,7 @@ export type Permissions =
 export type Plugin = {
   hooks?: Object,
   routes?: Object[],
-  reducers?: {[key: string]: Reducer<any, any>},
+  reducers?: { [key: string]: Reducer<any, any> },
   sagas: [][],
   register: (store: Store) => {
     hooks?: Object,
@@ -215,7 +214,10 @@ export type ResourceHistoryEntry = {
   id: string,
   last_modified: number,
   resource_name: string,
-  target: Object,
+  target: {
+    data: Object,
+    permissions: Object,
+  },
   timestamp: number,
   uri: string,
   user_id: string,
@@ -228,7 +230,7 @@ export type BucketRouteParams = {
 };
 
 export type BucketRoute = {
-  params: BucketRouteParams
+  params: BucketRouteParams,
 };
 
 export type CollectionRouteParams = {
@@ -237,7 +239,7 @@ export type CollectionRouteParams = {
 };
 
 export type CollectionRoute = {
-  params: CollectionRouteParams
+  params: CollectionRouteParams,
 };
 
 export type GroupRouteParams = {
@@ -246,7 +248,7 @@ export type GroupRouteParams = {
 };
 
 export type GroupRoute = {
-  params: GroupRouteParams
+  params: GroupRouteParams,
 };
 
 export type RecordRouteParams = {
@@ -256,7 +258,7 @@ export type RecordRouteParams = {
 };
 
 export type RecordRoute = {
-  params: RecordRouteParams
+  params: RecordRouteParams,
 };
 
 export type RouteParams = {
@@ -270,8 +272,8 @@ export type RouteLocation = {
   pathname: string,
   query: {
     since?: string,
-    resource_name?: string
-  }
+    resource_name?: string,
+  },
 };
 
 export type RouteResources = {
@@ -282,12 +284,13 @@ export type RouteResources = {
   group: ?GroupResource,
 };
 
-export type AuthMethod = "anonymous" | "fxa" | "ldap" | "basicauth";
+export type AuthMethod = "anonymous" | "fxa" | "ldap" | "basicauth" | "portier";
 
 export type SettingsState = {
   maxPerPage: number,
   singleServer: ?string,
-  authMethods: AuthMethod[]
+  authMethods: AuthMethod[],
+  sidebarMaxListedCollections: number,
 };
 
 export type AuthData = AnonymousAuth | LDAPAuth | BasicAuth | TokenAuth;
@@ -303,7 +306,7 @@ export type LDAPAuth = {
   credentials: {
     username: string,
     password: string,
-  }
+  },
 };
 
 export type BasicAuth = {
@@ -312,25 +315,40 @@ export type BasicAuth = {
   credentials: {
     username: string,
     password: string,
-  }
+  },
 };
 
 export type TokenAuth = {
   authType: "fxa",
   server: string,
   credentials: {
-    token: string
-  }
+    token: string,
+  },
 };
 
-export type SagaGen = Generator<*,void,*>;
+export type SagaGen = Generator<*, void, *>;
+
+export type CollectionEntry = {
+  id: string,
+  permissions: string[],
+  readonly: boolean,
+  last_modified: number,
+};
+
+export type BucketEntry = {
+  id: string,
+  permissions: string[],
+  collections: CollectionEntry[],
+  readonly: boolean,
+  last_modified: number,
+};
 
 export type SessionState = {
   busy: boolean,
-  auth: ?AuthData;
+  auth: ?AuthData,
   authenticated: boolean,
-  permissions: ?PermissionsListEntry[],
-  buckets: Object[],
+  permissions: ?(PermissionsListEntry[]),
+  buckets: BucketEntry[],
   serverInfo: ServerInfo,
   redirectURL: ?string,
 };
@@ -341,7 +359,7 @@ export type ServerInfo = {
   user?: {
     id: string,
     bucket?: string,
-  }
+  },
 };
 
 export type PermissionsListEntry = {

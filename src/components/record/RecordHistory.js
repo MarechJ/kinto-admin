@@ -8,13 +8,12 @@ import type {
   RouteLocation,
 } from "../../types";
 
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 
 import HistoryTable from "../HistoryTable";
 import RecordTabs from "./RecordTabs";
 
-
-export default class RecordHistory extends Component {
+export default class RecordHistory extends PureComponent {
   props: {
     params: RecordRouteParams,
     session: SessionState,
@@ -23,6 +22,7 @@ export default class RecordHistory extends Component {
     record: RecordState,
     location: RouteLocation,
     listRecordNextHistory: () => void,
+    notifyError: (message: string, error: ?Error) => void,
   };
 
   render() {
@@ -32,9 +32,10 @@ export default class RecordHistory extends Component {
       capabilities,
       location,
       listRecordNextHistory,
+      notifyError,
     } = this.props;
-    const {bid, cid, rid} = params;
-    const {history: {entries, loaded, hasNextPage}} = record;
+    const { bid, cid, rid } = params;
+    const { history: { entries, loaded, hasNextPage } } = record;
 
     return (
       <div>
@@ -51,7 +52,9 @@ export default class RecordHistory extends Component {
             history={entries}
             hasNextHistory={hasNextPage}
             listNextHistory={listRecordNextHistory}
-            location={location} />
+            location={location}
+            notifyError={notifyError}
+          />
         </RecordTabs>
       </div>
     );

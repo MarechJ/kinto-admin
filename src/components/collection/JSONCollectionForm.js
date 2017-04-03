@@ -1,12 +1,11 @@
 /* @flow */
 import type { CollectionData } from "../../types";
 
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import Form from "react-jsonschema-form";
 
 import JSONEditor from "../JSONEditor";
 import { validJSON, omit } from "../../utils";
-
 
 const schema = {
   type: "object",
@@ -22,7 +21,7 @@ const schema = {
       title: "Collection metadata (JSON)",
       default: "{}",
     },
-  }
+  },
 };
 
 const uiSchema = {
@@ -32,28 +31,30 @@ const uiSchema = {
   },
 };
 
-function validate({data}, errors) {
+function validate({ data }, errors) {
   if (!validJSON(data)) {
     errors.data.addError("Invalid JSON.");
   }
   return errors;
 }
 
-export default class JSONCollectionForm extends Component {
+export default class JSONCollectionForm extends PureComponent {
   props: {
     children?: React.Element<*>,
     cid: ?string,
     formData: CollectionData,
-    onSubmit: (data: {formData: CollectionData}) => void,
+    onSubmit: (data: { formData: CollectionData }) => void,
   };
 
-  onSubmit = ({formData}: {formData: {id: string, data: string}}): void => {
-    const collectionData = {...JSON.parse(formData.data), id: formData.id};
-    this.props.onSubmit({formData: collectionData});
-  }
+  onSubmit = (
+    { formData }: { formData: { id: string, data: string } }
+  ): void => {
+    const collectionData = { ...JSON.parse(formData.data), id: formData.id };
+    this.props.onSubmit({ formData: collectionData });
+  };
 
   render() {
-    const {children, cid, formData} = this.props;
+    const { children, cid, formData } = this.props;
     const creation = !cid;
 
     const attributes = omit(formData, ["id", "last_modified"]);
@@ -61,16 +62,18 @@ export default class JSONCollectionForm extends Component {
     const data = JSON.stringify(attributes, null, 2);
     const formDataSerialized = {
       id: cid,
-      data
+      data,
     };
 
     // Disable edition of the collection id
-    const _uiSchema = creation ? uiSchema : {
-      ...uiSchema,
-      id: {
-        "ui:readonly": true,
-      }
-    };
+    const _uiSchema = creation
+      ? uiSchema
+      : {
+          ...uiSchema,
+          id: {
+            "ui:readonly": true,
+          },
+        };
 
     return (
       <Form

@@ -6,13 +6,12 @@ import type {
   RouteLocation,
 } from "../../types";
 
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 
 import HistoryTable from "../HistoryTable";
 import CollectionTabs from "./GroupTabs";
 
-
-export default class GroupHistory extends Component {
+export default class GroupHistory extends PureComponent {
   props: {
     params: GroupRouteParams,
     group: GroupState,
@@ -20,6 +19,7 @@ export default class GroupHistory extends Component {
     location: RouteLocation,
     hasNextHistory: boolean,
     listGroupNextHistory: ?Function,
+    notifyError: (message: string, error: ?Error) => void,
   };
 
   render() {
@@ -29,9 +29,10 @@ export default class GroupHistory extends Component {
       capabilities,
       location,
       listGroupNextHistory,
+      notifyError,
     } = this.props;
-    const {bid, gid} = params;
-    const {history: {entries, loaded, hasNextPage}} = group;
+    const { bid, gid } = params;
+    const { history: { entries, loaded, hasNextPage } } = group;
 
     return (
       <div>
@@ -47,7 +48,9 @@ export default class GroupHistory extends Component {
             history={entries}
             hasNextHistory={hasNextPage}
             listNextHistory={listGroupNextHistory}
-            location={location} />
+            location={location}
+            notifyError={notifyError}
+          />
         </CollectionTabs>
       </div>
     );

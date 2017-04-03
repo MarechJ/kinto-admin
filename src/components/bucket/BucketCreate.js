@@ -1,13 +1,12 @@
 /* @flow */
 import type { SessionState, BucketState, BucketData } from "../../types";
 
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 
 import BucketForm from "./BucketForm";
 import Spinner from "../Spinner";
 
-
-export default class BucketCreate extends Component {
+export default class BucketCreate extends PureComponent {
   props: {
     session: SessionState,
     bucket: BucketState,
@@ -15,8 +14,8 @@ export default class BucketCreate extends Component {
   };
 
   render() {
-    const {session, bucket, createBucket} = this.props;
-    const {busy} = session;
+    const { session, bucket, createBucket } = this.props;
+    const { busy } = session;
     if (busy) {
       return <Spinner />;
     }
@@ -28,7 +27,8 @@ export default class BucketCreate extends Component {
             <BucketForm
               session={session}
               bucket={bucket}
-              onSubmit={({id, ...attributes}) => createBucket(id, attributes)} />
+              onSubmit={({ id, ...attributes }) => createBucket(id, attributes)}
+            />
           </div>
         </div>
       </div>

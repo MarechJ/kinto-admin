@@ -20,6 +20,18 @@ h1 {
   padding-top: 1em;
 }
 
+.sidebar-filters > .panel-body {
+  padding: 15px 15px 0 15px;
+}
+
+.sidebar-filters a.clear {
+  color: #777;
+}
+
+.list-group-item .glyphicon.glyphicon-lock {
+  color: #888;
+}
+
 .breadcrumbs {
   font-size: 1.2em;
   text-transform: lowercase;
@@ -204,6 +216,11 @@ table.record-list td.load-more {
   margin: 0;
 }
 
+.history-row-details .alert {
+  margin: 0;
+  border-radius: 0;
+}
+
 .sort-link {
   float: right;
   margin-top: .1em;
@@ -245,8 +262,18 @@ table.record-list td.load-more {
   color: #777;
 }
 
-.json-record {
-  min-height: 300px;
+.json-record > div {
+  padding: 1px 0 1px 4px;
+}
+
+.json-record > div.added {
+  background: #cbeecb;
+  color: green;
+}
+
+.json-record > div.removed {
+  background: #f0c9c9;
+  color: red;
 }
 
 .panel-heading > .glyphicon,

@@ -8,13 +8,12 @@ import type {
   RouteLocation,
 } from "../../types";
 
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 
 import HistoryTable from "../HistoryTable";
 import CollectionTabs from "./CollectionTabs";
 
-
-export default class CollectionHistory extends Component {
+export default class CollectionHistory extends PureComponent {
   props: {
     session: SessionState,
     bucket: BucketState,
@@ -23,6 +22,7 @@ export default class CollectionHistory extends Component {
     params: CollectionRouteParams,
     location: RouteLocation,
     listCollectionNextHistory: () => void,
+    notifyError: (message: string, error: ?Error) => void,
   };
 
   render() {
@@ -32,9 +32,10 @@ export default class CollectionHistory extends Component {
       capabilities,
       location,
       listCollectionNextHistory,
+      notifyError,
     } = this.props;
-    const {bid, cid} = params;
-    const {history: {entries, loaded, hasNextPage}} = collection;
+    const { bid, cid } = params;
+    const { history: { entries, loaded, hasNextPage } } = collection;
 
     return (
       <div>
@@ -45,12 +46,16 @@ export default class CollectionHistory extends Component {
           selected="history"
           capabilities={capabilities}>
           <HistoryTable
+            enableDiffOverview
             bid={bid}
+            cid={cid}
             historyLoaded={loaded}
             history={entries}
             hasNextHistory={hasNextPage}
             listNextHistory={listCollectionNextHistory}
-            location={location} />
+            location={location}
+            notifyError={notifyError}
+          />
         </CollectionTabs>
       </div>
     );
