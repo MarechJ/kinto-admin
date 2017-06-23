@@ -4,6 +4,7 @@ import type { RouteParams } from "./types";
 
 const URLS = {
   // Root url
+
   home: () => "/",
 
   // Bucket urls

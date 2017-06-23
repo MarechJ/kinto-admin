@@ -2,6 +2,9 @@ var path = require("path");
 var webpack = require("webpack");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 var version = require("./package.json").version;
+var password_api = require("./plugin_config.json").password_api
+
+console.log(password_api)
 
 module.exports = {
   devServer: {
@@ -14,7 +17,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, "build"),
     filename: "bundle.js",
-    publicPath: "/kinto-admin/",
+    publicPath: "/",
   },
   plugins: [
     new webpack.IgnorePlugin(/^(buffertools)$/), // unwanted "deeper" dependency
@@ -22,7 +25,8 @@ module.exports = {
     new webpack.DefinePlugin({
       "process.env": {
         NODE_ENV: JSON.stringify("production"),
-        KINTO_ADMIN_VERSION: JSON.stringify(version),
+          KINTO_ADMIN_VERSION: JSON.stringify(version),
+          PASSWORD_API: JSON.stringify(password_api)
       }
     }),
     new webpack.optimize.UglifyJsPlugin({

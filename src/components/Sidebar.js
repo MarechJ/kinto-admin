@@ -291,6 +291,14 @@ export default class Sidebar extends PureComponent {
               Home
             </SideBarLink>
           </div>
+            </div>
+
+        <div className="panel panel-default">
+            <div className="list-group">
+
+            <a className="list-group-item " href="#/plugin/passgen"><i className="glyphicon glyphicon-lock"></i>Password generator</a>
+
+            </div>
         </div>
         {authenticated &&
           <BucketsMenu
