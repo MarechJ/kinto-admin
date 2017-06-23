@@ -16,7 +16,7 @@ import { ProgressBar, ProgressStep } from "./ProgressBar.js";
 
 function isMember(groupKey, source, sessionState, bucketState) {
   const { serverInfo: { user = {}, capabilities } } = sessionState;
-  if (!user.id) {
+  if (!source || !user.id) {
     return false;
   }
   const { signer = {} } = capabilities;
@@ -57,10 +57,10 @@ export default class SignoffToolBar extends React.Component {
     bucketState: BucketState,
     collectionState: CollectionState,
     signoff: SignoffState,
-    requestReview: (string) => void,
+    requestReview: string => void,
     confirmRequestReview: () => void,
     approveChanges: () => void,
-    declineChanges: (string) => void,
+    declineChanges: string => void,
     confirmDeclineChanges: () => void,
     cancelPendingConfirm: () => void,
   };
@@ -94,20 +94,21 @@ export default class SignoffToolBar extends React.Component {
 
     // Information loaded via this plugin.
     const {
-      resource,
+      collections,
       pendingConfirmReviewRequest,
       pendingConfirmDeclineChanges,
     } = signoff;
     // Hide toolbar if server has not kinto-signer plugin,
     // or if this collection is not configured to be signed.
-    if (!resource) {
+    if (!collections) {
       return null;
     }
+    const { source, destination, preview } = collections;
 
-    const { source, preview, destination } = resource;
-    const canRequestReview = canEdit &&
-      isEditor(source, sessionState, bucketState);
-    const canReview = canEdit &&
+    const canRequestReview =
+      canEdit && isEditor(source, sessionState, bucketState);
+    const canReview =
+      canEdit &&
       isReviewer(source, sessionState, bucketState) &&
       !isLastEditor(source, sessionState);
     const canSign = canEdit && isReviewer(source, sessionState, bucketState);
@@ -204,23 +205,26 @@ type WorkInProgressProps = {
   source: SourceInfo,
 };
 
-function WorkInProgress(
-  {
+function WorkInProgress(props: WorkInProgressProps) {
+  const {
     label,
     canEdit,
     currentStep,
     step,
     confirmRequestReview,
     source,
-  }: WorkInProgressProps
-) {
+  } = props;
+
   const active = step == currentStep;
   const { lastAuthor, lastReviewerComment, changes = {} } = source;
   const { lastUpdated } = changes;
   return (
-    <ProgressStep {...{ label, currentStep, step }}>
+    <ProgressStep label={label} currentStep={currentStep} step={step}>
       <WorkInProgressInfos
-        {...{ active, lastAuthor, lastUpdated, lastReviewerComment }}
+        active={active}
+        lastAuthor={lastAuthor}
+        lastUpdated={lastUpdated}
+        lastReviewerComment={lastReviewerComment}
       />
       {active &&
         lastUpdated &&
@@ -230,9 +234,8 @@ function WorkInProgress(
   );
 }
 
-function WorkInProgressInfos(
-  { active, lastAuthor, lastUpdated, lastReviewerComment }
-) {
+function WorkInProgressInfos(props) {
+  const { active, lastAuthor, lastUpdated, lastReviewerComment } = props;
   if (!lastUpdated) {
     return <ul><li>Never updated</li></ul>;
   }
@@ -249,9 +252,10 @@ function WorkInProgressInfos(
   );
 }
 
-function RequestReviewButton(props: Object) {
+function RequestReviewButton(props: { onClick: () => void }) {
+  const { onClick } = props;
   return (
-    <button className="btn btn-info" {...props}>
+    <button className="btn btn-info" onClick={onClick}>
       <i className="glyphicon glyphicon-comment" />{" "}Request review...
     </button>
   );
@@ -270,7 +274,7 @@ type ReviewProps = {
   approveChanges: () => void,
   confirmDeclineChanges: () => void,
   source: SourceInfo,
-  preview: PreviewInfo,
+  preview: ?PreviewInfo,
 };
 
 function Review(props: ReviewProps) {
@@ -303,10 +307,14 @@ function Review(props: ReviewProps) {
 
   const { lastEditor } = source;
   return (
-    <ProgressStep {...{ label, currentStep, step }}>
+    <ProgressStep label={label} currentStep={currentStep} step={step}>
       {lastEditor &&
         <ReviewInfos
-          {...{ active, source, lastRequested, link, hasHistory }}
+          active={active}
+          source={source}
+          lastRequested={lastRequested}
+          link={link}
+          hasHistory={hasHistory}
         />}
       {active &&
         canEdit &&
@@ -326,12 +334,12 @@ type ReviewInfosProps = {
   hasHistory: boolean,
 };
 
-function ReviewInfos(
-  { active, source, lastRequested, link, hasHistory }: ReviewInfosProps
-) {
+function ReviewInfos(props: ReviewInfosProps) {
+  const { active, source, lastRequested, link, hasHistory } = props;
   const { bid, cid, lastEditor, lastEditorComment, changes = {} } = source;
   const { since, deleted, updated } = changes;
-  const detailsLink = hasHistory &&
+  const detailsLink =
+    hasHistory &&
     <AdminLink
       name="collection:history"
       params={{ bid, cid }}
@@ -361,7 +369,8 @@ function ReviewInfos(
   );
 }
 
-function DiffStats({ updated, deleted }: { updated: number, deleted: number }) {
+function DiffStats(props: { updated: number, deleted: number }) {
+  const { updated, deleted } = props;
   return (
     <span className="diffstats">
       {updated > 0 && <span className="text-green">+{updated}</span>}
@@ -371,8 +380,9 @@ function DiffStats({ updated, deleted }: { updated: number, deleted: number }) {
 }
 
 function ReviewButtons(
-  { onApprove, onDecline }: { onApprove: () => void, onDecline: () => void }
+  props: { onApprove: () => void, onDecline: () => void }
 ) {
+  const { onApprove, onDecline } = props;
   return (
     <div className="btn-group">
       <button className="btn btn-success" onClick={onApprove}>
@@ -396,11 +406,11 @@ type SignedProps = {
   step: number,
   reSign: () => void,
   source: SourceInfo,
-  destination: DestinationInfo,
+  destination: ?DestinationInfo,
 };
 
-function Signed(
-  {
+function Signed(props: SignedProps) {
+  const {
     label,
     canEdit,
     currentStep,
@@ -408,14 +418,14 @@ function Signed(
     reSign,
     source,
     destination,
-  }: SignedProps
-) {
+  } = props;
   const active = step == currentStep && canEdit;
   const { lastReviewer } = source;
-  const { lastSigned } = destination;
   return (
-    <ProgressStep {...{ label, currentStep, step }}>
-      {lastSigned && <SignedInfos {...{ lastReviewer, destination }} />}
+    <ProgressStep label={label} currentStep={currentStep} step={step}>
+      {destination &&
+        destination.lastSigned &&
+        <SignedInfos lastReviewer={lastReviewer} destination={destination} />}
       {active && <ReSignButton onClick={reSign} />}
     </ProgressStep>
   );
@@ -426,7 +436,8 @@ type SignedInfosProps = {
   destination: DestinationInfo,
 };
 
-function SignedInfos({ lastReviewer, destination }: SignedInfosProps) {
+function SignedInfos(props: SignedInfosProps) {
+  const { lastReviewer, destination } = props;
   const { lastSigned, bid, cid } = destination;
   return (
     <ul>
@@ -442,9 +453,10 @@ function SignedInfos({ lastReviewer, destination }: SignedInfosProps) {
   );
 }
 
-function ReSignButton(props: Object) {
+function ReSignButton(props: { onClick: () => void }) {
+  const { onClick } = props;
   return (
-    <button className="btn btn-info" {...props}>
+    <button className="btn btn-info" onClick={onClick}>
       <i className="glyphicon glyphicon-repeat" />{" "}Re-sign
     </button>
   );
@@ -456,7 +468,7 @@ function ReSignButton(props: Object) {
 type CommentDialogProps = {
   description: string,
   confirmLabel: string,
-  onConfirm: (string) => void,
+  onConfirm: string => void,
   onCancel: () => void,
 };
 
@@ -484,7 +496,7 @@ class CommentDialog extends PureComponent {
     const onClickConfirm = () => onConfirm(comment);
 
     return (
-      <div className="model-open">
+      <div className="modal-open">
         <div
           className="modal fade in"
           role="dialog"
